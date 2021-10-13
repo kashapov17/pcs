@@ -18,12 +18,11 @@ int main() {
 
     auto u = universe(10);
 
-    uint numOfGenerations = 1000000;
+    uint numOfGenerations = 100000;
     auto timer = timer_start;
     for (uint i=0; i < numOfGenerations; ++i) {
         u.nextgen();
-        //std::cout << "Current generation: " << u.getGeneraton() << "\n";
-        std::cout << "Current generation: " << u.getGeneraton() << " Number of living cell: " << u.getNumberOfLiving() << std::endl;
+        std::cout << "GEN: " << u.getGeneraton() << " LIVING: " << u.getNumberOfLiving() << std::endl;
     }
     auto elapsed = timer_elapsed(timer);
     std::cout << "Life for " << numOfGenerations << " generagtions took " << elapsed << " seconds" <<std::endl;
