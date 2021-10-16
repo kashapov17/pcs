@@ -2,13 +2,10 @@
 // Created by yaroslav on 10/5/21.
 //
 
-#include <iostream>
-
 #include "universe.h"
 
 universe::universe(uint size) {
     universeSize = size;
-    generation = 0;
     cube cube (
             size, std::vector<std::vector<cell>> (
                     size, std::vector<cell>(size)
@@ -30,11 +27,11 @@ uint universe::getNumberOfLiving() const{
     return numberOfLiving;
 }
 
-void universe::kill(uint x, uint y, uint z) {
+void universe::kill(const uint &x, const uint &y, const uint &z) {
     cuboid[x][y][z].die();
 }
 
-void universe::revive(uint x, uint y, uint z) {
+void universe::revive(const uint &x, const uint &y, const uint &z) {
     cuboid[x][y][z].resurrect();
 }
 
@@ -45,19 +42,15 @@ bool universe::nextgen() {
         for (uint y=0; y < universeSize; ++y) {
             for (uint z=0; z < universeSize; ++z) {
                 uint neighs = checkNeigh(x,y,z);
-                if (cuboid[x][y][z].isAlive()) {
-                    if (cuboid[x][y][z].age() == 2) {
-                        toBeKilled.push_back(&cuboid[x][y][z]);
-                        continue;
-                    }
-                    cuboid[x][y][z].age()++;
-                        if ((neighs > 5 && neighs < 14)) {
-                            toBeKilled.push_back(&cuboid[x][y][z]);
-                        }
-                } else {
+                cell *cell = &cuboid[x][y][z];
+                if (cell->isAlive())
+                    if ((neighs > 5 && neighs < 14) or cell->getAge() > 1)
+                        toBeKilled.push_back(cell);
+                    else
+                        cell->setAge(cell->getAge()+1);
+                else
                     if (neighs == 7 or neighs == 21 or neighs == 14 or neighs == 3) {
-                        toBeRevived.push_back(&cuboid[x][y][z]);
-                    }
+                        toBeRevived.push_back(cell);
                 }
             }
         }
@@ -95,7 +88,7 @@ bool universe::compareUniverses(cube u1, cube u2) {
     return false;
 }
 
-uint universe::checkNeigh(uint x, uint y, uint z) {
+uint universe::checkNeigh(const uint &x, const uint &y, const uint &z) const {
     uint numberOfAlive = 0;
     for (const auto &xitem : calculateNeighCoordsByAxis(x)) {
         for (const auto &yitem : calculateNeighCoordsByAxis(y)) {
@@ -111,18 +104,6 @@ uint universe::checkNeigh(uint x, uint y, uint z) {
 
 uint universe::getGeneraton() const {
     return generation;
-}
-
-void universe::print() {
-    for (uint x=0; x < universeSize; ++x) {
-        std::cout << "\nx=" << x;
-        for (uint y = 0; y < universeSize; ++y) {
-            std::cout << "\n";
-            for (uint z = 0; z < universeSize; ++z) {
-                std::cout << (cuboid[x][y][z].age()) << " ";
-            }
-        }
-    }
 }
 
 void universe::genUniverse() {
@@ -146,4 +127,8 @@ void universe::genUniverse() {
 
 std::vector<uint> universe::calculateNeighCoordsByAxis(const uint &x) const {
     return {(-1 + x +universeSize) % universeSize, x, (1 + x + universeSize) % universeSize};
+}
+
+universe::~universe() {
+    cuboid.clear();
 }

@@ -8,7 +8,6 @@
 #include <vector>
 #include <deque>
 #include <utility>
-
 #include "cell.h"
 
 using cube = std::vector<std::vector<std::vector<cell>>>;
@@ -16,27 +15,22 @@ using cube = std::vector<std::vector<std::vector<cell>>>;
 class universe {
     cube cuboid;
     std::deque<cube> stagnation_queue;
-    void kill(uint x, uint y, uint z);
-    void revive(uint x, uint y, uint z);
-    void makeUniverseEmpty(cube &cube) const;
-    uint checkNeigh(uint x, uint y, uint z);
+    void kill(const uint &x, const uint &y, const uint &z);
+    void revive(const uint &x, const uint &y, const uint &z);
+    uint checkNeigh(const uint &x, const uint &y, const uint &z) const;
     std::vector<uint> calculateNeighCoordsByAxis(const uint &x) const;
     bool checkStagnation();
     bool compareUniverses(cube, cube);
     void genUniverse();
-    void write();
-    void load();
     uint universeSize;
-    uint generation;
+    uint generation=0;
 
 public:
     explicit universe(uint size);
+    ~universe();
     uint getNumberOfLiving()  const;
     uint getGeneraton() const;
     bool nextgen();
-    void print();
-    void test();
-
 };
 
 #endif //PCS_UNIVERSE_H
