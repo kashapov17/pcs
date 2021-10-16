@@ -17,6 +17,7 @@ public:
     void die();
     void resurrect();
     bool isAlive() const;
-    uint &age();
+    void setAge(uint age);
+    uint getAge();
 };
 #endif //PCS_CELL_H

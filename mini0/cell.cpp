@@ -21,6 +21,10 @@ bool cell::isAlive() const{
     return (state == ALIVED);
 }
 
-uint &cell::age() {
+void cell::setAge(const uint age) {
+    _age = age;
+}
+
+uint cell::getAge() {
     return _age;
 }
