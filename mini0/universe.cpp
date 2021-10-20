@@ -3,6 +3,7 @@
 //
 
 #include "universe.h"
+#include <cstdlib>
 
 universe::universe(uint size) {
     universeSize = size;
@@ -107,11 +108,12 @@ uint universe::getGeneraton() const {
 }
 
 void universe::genUniverse() {
+    srand(10);
     for (uint x=0; x < universeSize; ++x) {
         for (uint y = 0; y < universeSize; ++y) {
             for (uint z = 0; z < universeSize; ++z) {
                 if (x == 0 or y == 0 or z == 0 or x == universeSize-1 or y == universeSize-1 or z == universeSize-1)
-                    if (std::rand() % 10)
+                    if (rand() % 10)
                         cuboid[x][y][z].resurrect();
             }
         }
@@ -125,7 +127,7 @@ void universe::genUniverse() {
 //    cuboid[6][6][5].resurrect();
 }
 
-std::vector<uint> universe::calculateNeighCoordsByAxis(const uint &x) const {
+inline std::vector<uint> universe::calculateNeighCoordsByAxis(const uint &x) const {
     return {(-1 + x +universeSize) % universeSize, x, (1 + x + universeSize) % universeSize};
 }
 

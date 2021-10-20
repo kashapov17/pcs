@@ -25,6 +25,6 @@ void cell::setAge(const uint age) {
     _age = age;
 }
 
-uint cell::getAge() {
+uint cell::getAge() const {
     return _age;
 }

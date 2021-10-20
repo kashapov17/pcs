@@ -18,6 +18,6 @@ public:
     void resurrect();
     bool isAlive() const;
     void setAge(uint age);
-    uint getAge();
+    uint getAge() const;
 };
 #endif //PCS_CELL_H
