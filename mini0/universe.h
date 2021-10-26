@@ -8,6 +8,8 @@
 #include <vector>
 #include <deque>
 #include <utility>
+#include <ostream>
+
 #include "cell.h"
 
 using cube = std::vector<std::vector<std::vector<cell>>>;
@@ -31,6 +33,7 @@ public:
     uint getNumberOfLiving()  const;
     uint getGeneraton() const;
     bool nextgen();
+    void print(std::ostream &ost) const;
 };
 
 #endif //PCS_UNIVERSE_H

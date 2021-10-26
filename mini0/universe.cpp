@@ -2,8 +2,10 @@
 // Created by yaroslav on 10/5/21.
 //
 
-#include "universe.h"
 #include <cstdlib>
+#include <iostream>
+
+#include "universe.h"
 
 universe::universe(uint size) {
     universeSize = size;
@@ -44,11 +46,12 @@ bool universe::nextgen() {
             for (uint z=0; z < universeSize; ++z) {
                 uint neighs = checkNeigh(x,y,z);
                 cell *cell = &cuboid[x][y][z];
-                if (cell->isAlive())
-                    if ((neighs > 5 && neighs < 14) or cell->getAge() > 1)
+                if (cell->isAlive()) {
+                    if ((neighs > 5 && neighs < 14) or cell->getAge() > 2)
                         toBeKilled.push_back(cell);
-                    else
-                        cell->setAge(cell->getAge()+1);
+
+                    cell->setAge(cell->getAge()+1);
+                }
                 else
                     if (neighs == 7 or neighs == 21 or neighs == 14 or neighs == 3) {
                         toBeRevived.push_back(cell);
@@ -110,21 +113,17 @@ uint universe::getGeneraton() const {
 void universe::genUniverse() {
     srand(10);
     for (uint x=0; x < universeSize; ++x) {
-        for (uint y = 0; y < universeSize; ++y) {
-            for (uint z = 0; z < universeSize; ++z) {
-                if (x == 0 or y == 0 or z == 0 or x == universeSize-1 or y == universeSize-1 or z == universeSize-1)
-                    if (rand() % 10)
-                        cuboid[x][y][z].resurrect();
-            }
-        }
+         for (uint y = 0; y < universeSize; ++y) {
+             for (uint z = 0; z < universeSize; ++z) {
+                 if (x == 0 or y == 0 or z == 0 or x == universeSize-1 or y == universeSize-1 or z == universeSize-1)
+                     if (rand() % 10)
+                         cuboid[x][y][z].resurrect();
+	    }
+	}
     }
-//    cuboid[4][5][5].resurrect();
-//    cuboid[6][5][5].resurrect();
-//    cuboid[5][4][5].resurrect();
-//    cuboid[5][6][5].resurrect();
-//    cuboid[5][5][4].resurrect();
-//    cuboid[5][5][6].resurrect();
-//    cuboid[6][6][5].resurrect();
+//   cuboid[3][3][3].resurrect();
+//   cuboid[3][2][3].resurrect();
+//   cuboid[3][3][2].resurrect();
 }
 
 inline std::vector<uint> universe::calculateNeighCoordsByAxis(const uint &x) const {
@@ -133,4 +132,16 @@ inline std::vector<uint> universe::calculateNeighCoordsByAxis(const uint &x) con
 
 universe::~universe() {
     cuboid.clear();
+}
+
+void universe::print(std::ostream &ost) const {
+    for (uint x=0; x < universeSize; ++x) {
+        ost << "\nx=" << x;
+        for (uint y = 0; y < universeSize; ++y) {
+            ost << "\n";
+            for (uint z = 0; z < universeSize; ++z) {
+                ost << cuboid[x][y][z].isAlive() << " ";
+            }
+        }
+    }
 }

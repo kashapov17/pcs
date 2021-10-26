@@ -14,7 +14,7 @@
 int main() {
 
     uint universeSize=10;
-    uint numOfGenerations = 10000;
+    uint numOfGenerations=10000;
 
     std::cout << "Size of cube: ";
     std::cin >> universeSize;
@@ -22,22 +22,35 @@ int main() {
     std::cout << "Number of generations: ";
     std::cin >> numOfGenerations;
 
-    char printGenInfo;
+    char printGenInfo = 'y';
+    char printGenMaps = 'n';
     do {
         std::cout << "Print generations info? [y/n]: ";
         std::cin >> printGenInfo;
     }
-    while( !std::cin.fail() && std::tolower(printGenInfo) !='y' && std::tolower(printGenInfo) !='n');
+    while(!std::cin.fail() && std::tolower(printGenInfo) !='y' && std::tolower(printGenInfo) !='n');
+
+    if (printGenInfo == 'y') {
+	do {
+	    std::cout << "Print cube layers? [y/n]: ";
+	    std::cin >> printGenMaps;
+	}
+	while(!std::cin.fail() && std::tolower(printGenMaps) !='y' && std::tolower(printGenMaps) !='n');
+    }
 
     std::cout << "Life has begun...\n";
     auto timer = timer_start;
 
     auto u = new universe(universeSize);
     bool lifeDie = false;
+    std::ostream &ost(std::cout);
     for (uint i=0; i < numOfGenerations; ++i) {
 
-        if (printGenInfo == 'y')
+        if (printGenInfo == 'y') {
             std::cout << "GEN: " << u->getGeneraton() << " LIVING: " << u->getNumberOfLiving() << std::endl;
+	    if (printGenMaps == 'y') 
+                u->print(ost);
+        }
         if (!u->nextgen()) {
             lifeDie = true;
             numOfGenerations = i+1;
@@ -46,10 +59,10 @@ int main() {
     }
     auto elapsed = timer_elapsed(timer);
     if (lifeDie) {
-        std::cout << "All cellulars died due to mass extinction\n";
+        std::cout << "All cellulars died due to mass extinction on " << numOfGenerations << " generation\n";
     }
-    std::cout << "Life for " << numOfGenerations << " generations took " << elapsed << " seconds" <<std::endl;
+    std::cout << "Life for " << numOfGenerations << " generations took " << elapsed << " microseconds" << std::endl;
     delete u;
-
+    u = nullptr;
     return 0;
 }
