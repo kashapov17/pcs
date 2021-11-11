@@ -4,6 +4,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <atomic>
+#include <omp.h>
 
 #include "universe.h"
 
@@ -15,11 +17,16 @@ universe::universe(uint size) {
 }
 
 uint universe::getNumberOfLiving() {
-    uint numberOfLiving = 0;
-    for (int x = 0; x < universeSize; ++x) {
-        for (int y = 0; y < universeSize; ++y) {
-            for (int z = 0; z < universeSize; ++z) {
-                cellFromCube(x, y, z).isAlive() ? numberOfLiving++ : numberOfLiving;
+    uint numberOfLiving;
+    int x,y,z;
+#pragma omp parallel
+    {
+    #pragma omp for collapse(3) reduction(+:numberOfLiving)
+        for (x = 0; x < universeSize; ++x) {
+            for (y = 0; y < universeSize; ++y) {
+                for (z = 0; z < universeSize; ++z) {
+                    cellFromCube(x, y, z).isAlive() ? numberOfLiving++ : numberOfLiving;
+                }
             }
         }
     }
@@ -35,33 +42,38 @@ void universe::revive(const int &x, const int &y, const int &z) {
 }
 
 bool universe::nextgen() {
+    int x,y,z,sumOfCubeChanges=0;
+#pragma omp parallel
+    {
     std::vector<cell*> toBeKilled;
     std::vector<cell*> toBeRevived;
-    for (int x=0; x < universeSize; ++x) {
-        for (int y=0; y < universeSize; ++y) {
-            for (int z=0; z < universeSize; ++z) {
-                uint neighs = checkNeigh(x,y,z);
-                cell *cell = &cellFromCube(x, y, z);
-                if (cell->isAlive()) {
-                    if ((neighs > 5 && neighs < 14) or cell->getAge() > 2)
-                        toBeKilled.push_back(cell);
-
-                    cell->setAge(cell->getAge()+1);
-                }
-                else
-                    if (neighs == 7 or neighs == 21 or neighs == 14 or neighs == 3) {
+    #pragma omp for collapse(3) reduction(+:sumOfCubeChanges)
+        for (x = 0; x < universeSize; ++x) {
+            for (y = 0; y < universeSize; ++y) {
+                for (z = 0; z < universeSize; ++z) {
+                    uint neighs = checkNeigh(x, y, z);
+                    cell *cell = &cellFromCube(x, y, z);
+                    if (cell->isAlive()) {
+                        if ((neighs > 5 && neighs < 14) or cell->getAge() > 2)
+                            toBeKilled.push_back(cell);
+                        cell->setAge(cell->getAge() + 1);
+                    } else if (neighs == 7 or neighs == 21 or neighs == 14 or neighs == 3) {
                         toBeRevived.push_back(cell);
+                    }
                 }
             }
         }
+        sumOfCubeChanges+=toBeRevived.size()+toBeKilled.size();
+        if (sumOfCubeChanges != 0) {
+            for (auto &cell : toBeKilled)
+                cell->die();
+            for (auto &cell : toBeRevived)
+                cell->resurrect();
+        }
     }
 
-    for(auto &cell : toBeKilled)
-        cell->die();
-    for(auto &cell : toBeRevived)
-        cell->resurrect();
     generation++;
-    return getNumberOfLiving() != 0;
+    return static_cast<bool>(sumOfCubeChanges);
 }
 
 uint universe::checkNeigh(const int &x, const int &y, const int &z) {
