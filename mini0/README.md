@@ -32,7 +32,7 @@ make
 yaroslav@arch ~/repos/pcs/build (master*?) $ ls
 CMakeCache.txt  CMakeFiles  cmake_install.cmake  Makefile  mini0 <-----
 ```
-Запускаем скомпелированную программу:
+Запускаем скомпилированную программу:
 ```
 ./mini0
 ```
